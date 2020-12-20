@@ -1,0 +1,135 @@
+<html>
+<head>
+<title>OpenCV.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6897bb;}
+.s3 { color: #6a8759;}
+.s4 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+OpenCV.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<span class="s0">import </span><span class="s1">cv2</span>
+
+<span class="s1">webcam = cv2.VideoCapture(</span><span class="s2">0</span><span class="s1">)</span>
+<span class="s1">viewblue = </span><span class="s0">False</span>
+<span class="s1">viewred = </span><span class="s0">False</span>
+
+<span class="s0">while </span><span class="s1">(</span><span class="s2">1</span><span class="s1">):</span>
+
+    <span class="s1">_</span><span class="s0">, </span><span class="s1">imageFrame = webcam.read()</span>
+
+    <span class="s1">hsvFrame = cv2.cvtColor(imageFrame</span><span class="s0">, </span><span class="s1">cv2.COLOR_BGR2HSV)</span>
+
+    <span class="s1">red_lower = np.array([</span><span class="s2">136</span><span class="s0">, </span><span class="s2">87</span><span class="s0">, </span><span class="s2">111</span><span class="s1">]</span><span class="s0">, </span><span class="s1">np.uint8)</span>
+    <span class="s1">red_upper = np.array([</span><span class="s2">180</span><span class="s0">, </span><span class="s2">255</span><span class="s0">, </span><span class="s2">255</span><span class="s1">]</span><span class="s0">, </span><span class="s1">np.uint8)</span>
+    <span class="s1">red_mask = cv2.inRange(hsvFrame</span><span class="s0">, </span><span class="s1">red_lower</span><span class="s0">, </span><span class="s1">red_upper)</span>
+
+    <span class="s1">orange_lower = np.array([</span><span class="s2">12</span><span class="s0">, </span><span class="s2">100</span><span class="s0">, </span><span class="s2">100</span><span class="s1">]</span><span class="s0">, </span><span class="s1">np.uint8)</span>
+    <span class="s1">orange_upper = np.array([</span><span class="s2">36</span><span class="s0">, </span><span class="s2">255</span><span class="s0">, </span><span class="s2">255</span><span class="s1">]</span><span class="s0">, </span><span class="s1">np.uint8)</span>
+    <span class="s1">orange_mask = cv2.inRange(hsvFrame</span><span class="s0">, </span><span class="s1">orange_lower</span><span class="s0">, </span><span class="s1">orange_upper)</span>
+
+    <span class="s1">blue_lower = np.array([</span><span class="s2">94</span><span class="s0">, </span><span class="s2">80</span><span class="s0">, </span><span class="s2">2</span><span class="s1">]</span><span class="s0">, </span><span class="s1">np.uint8)</span>
+    <span class="s1">blue_upper = np.array([</span><span class="s2">120</span><span class="s0">, </span><span class="s2">255</span><span class="s0">, </span><span class="s2">255</span><span class="s1">]</span><span class="s0">, </span><span class="s1">np.uint8)</span>
+    <span class="s1">blue_mask = cv2.inRange(hsvFrame</span><span class="s0">, </span><span class="s1">blue_lower</span><span class="s0">, </span><span class="s1">blue_upper)</span>
+
+    <span class="s1">kernal = np.ones((</span><span class="s2">5</span><span class="s0">, </span><span class="s2">5</span><span class="s1">)</span><span class="s0">, </span><span class="s3">&quot;uint8&quot;</span><span class="s1">)</span>
+
+    <span class="s1">red_mask = cv2.dilate(red_mask</span><span class="s0">, </span><span class="s1">kernal)</span>
+    <span class="s1">res_red = cv2.bitwise_and(imageFrame</span><span class="s0">, </span><span class="s1">imageFrame</span><span class="s0">,</span>
+                              <span class="s1">mask=red_mask)</span>
+
+    <span class="s1">orange_mask = cv2.dilate(orange_mask</span><span class="s0">, </span><span class="s1">kernal)</span>
+    <span class="s1">res_orange = cv2.bitwise_and(imageFrame</span><span class="s0">, </span><span class="s1">imageFrame</span><span class="s0">,</span>
+                                <span class="s1">mask=orange_mask)</span>
+
+    <span class="s4"># For blue color</span>
+    <span class="s1">blue_mask = cv2.dilate(blue_mask</span><span class="s0">, </span><span class="s1">kernal)</span>
+    <span class="s1">res_blue = cv2.bitwise_and(imageFrame</span><span class="s0">, </span><span class="s1">imageFrame</span><span class="s0">,</span>
+                               <span class="s1">mask=blue_mask)</span>
+
+    <span class="s0">if </span><span class="s1">viewred == </span><span class="s0">True</span><span class="s1">:</span>
+        <span class="s1">contours</span><span class="s0">, </span><span class="s1">hierarchy = cv2.findContours(red_mask</span><span class="s0">,</span>
+                                           <span class="s1">cv2.RETR_TREE</span><span class="s0">,</span>
+                                           <span class="s1">cv2.CHAIN_APPROX_SIMPLE)</span>
+
+        <span class="s0">for </span><span class="s1">pic</span><span class="s0">, </span><span class="s1">contour </span><span class="s0">in </span><span class="s1">enumerate(contours):</span>
+            <span class="s1">area = cv2.contourArea(contour)</span>
+            <span class="s0">if </span><span class="s1">(area &gt; </span><span class="s2">300</span><span class="s1">):</span>
+                <span class="s1">x</span><span class="s0">, </span><span class="s1">y</span><span class="s0">, </span><span class="s1">w</span><span class="s0">, </span><span class="s1">h = cv2.boundingRect(contour)</span>
+                <span class="s1">imageFrame = cv2.rectangle(imageFrame</span><span class="s0">, </span><span class="s1">(x</span><span class="s0">, </span><span class="s1">y)</span><span class="s0">,</span>
+                                       <span class="s1">(x + w</span><span class="s0">, </span><span class="s1">y + h)</span><span class="s0">,</span>
+                                       <span class="s1">(</span><span class="s2">0</span><span class="s0">, </span><span class="s2">0</span><span class="s0">, </span><span class="s2">255</span><span class="s1">)</span><span class="s0">, </span><span class="s2">2</span><span class="s1">)</span>
+
+                <span class="s1">cv2.putText(imageFrame</span><span class="s0">, </span><span class="s3">&quot;Red Color&quot;</span><span class="s0">, </span><span class="s1">(x</span><span class="s0">, </span><span class="s1">y)</span><span class="s0">,</span>
+                        <span class="s1">cv2.FONT_HERSHEY_SIMPLEX</span><span class="s0">, </span><span class="s2">1.0</span><span class="s0">,</span>
+                        <span class="s1">(</span><span class="s2">0</span><span class="s0">, </span><span class="s2">0</span><span class="s0">, </span><span class="s2">255</span><span class="s1">))</span>
+
+    <span class="s1">contours</span><span class="s0">, </span><span class="s1">hierarchy = cv2.findContours(orange_mask</span><span class="s0">,</span>
+                                           <span class="s1">cv2.RETR_TREE</span><span class="s0">,</span>
+                                           <span class="s1">cv2.CHAIN_APPROX_SIMPLE)</span>
+    <span class="s1">path = </span><span class="s3">''</span>
+    <span class="s0">if </span><span class="s1">len(contours) &gt; </span><span class="s2">0</span><span class="s1">:</span>
+        <span class="s1">c = max(contours</span><span class="s0">, </span><span class="s1">key=cv2.contourArea)</span>
+
+        <span class="s1">area = cv2.contourArea(c)</span>
+        <span class="s0">if </span><span class="s1">(area &gt; </span><span class="s2">1500</span><span class="s1">):</span>
+            <span class="s1">x</span><span class="s0">, </span><span class="s1">y</span><span class="s0">, </span><span class="s1">w</span><span class="s0">, </span><span class="s1">h = cv2.boundingRect(c)</span>
+            <span class="s1">imageFrame = cv2.rectangle(imageFrame</span><span class="s0">, </span><span class="s1">(x</span><span class="s0">, </span><span class="s1">y)</span><span class="s0">,</span>
+                                       <span class="s1">(x + w</span><span class="s0">, </span><span class="s1">y + h)</span><span class="s0">,</span>
+                                       <span class="s1">(</span><span class="s2">33</span><span class="s0">,</span><span class="s2">137</span><span class="s0">,</span><span class="s2">255</span><span class="s1">)</span><span class="s0">, </span><span class="s2">2</span><span class="s1">)</span>
+
+            <span class="s1">cv2.putText(imageFrame</span><span class="s0">, </span><span class="s3">&quot;Wobble Ring?&quot;</span><span class="s0">, </span><span class="s1">(x</span><span class="s0">, </span><span class="s1">y)</span><span class="s0">,</span>
+                        <span class="s1">cv2.FONT_HERSHEY_SIMPLEX</span><span class="s0">,</span>
+                        <span class="s2">1.0</span><span class="s0">, </span><span class="s1">(</span><span class="s2">33</span><span class="s0">,</span><span class="s2">137</span><span class="s0">,</span><span class="s2">255</span><span class="s1">))</span>
+
+            <span class="s1">ratio = w / h</span>
+            <span class="s0">if </span><span class="s1">ratio &lt;= </span><span class="s2">2</span><span class="s1">:</span>
+                <span class="s1">path = </span><span class="s3">'C'</span>
+            <span class="s0">else</span><span class="s1">:</span>
+                <span class="s1">path = </span><span class="s3">'B'</span>
+
+        <span class="s0">else</span><span class="s1">:</span>
+            <span class="s1">path = </span><span class="s3">'A'</span>
+    <span class="s0">else</span><span class="s1">:</span>
+        <span class="s1">path = </span><span class="s3">'A'</span>
+    <span class="s1">cv2.putText(imageFrame</span><span class="s0">, </span><span class="s3">&quot;Path &quot; </span><span class="s1">+ path</span><span class="s0">, </span><span class="s1">(</span><span class="s2">50</span><span class="s0">, </span><span class="s2">50</span><span class="s1">)</span><span class="s0">,</span>
+                    <span class="s1">cv2.FONT_HERSHEY_SIMPLEX</span><span class="s0">,</span>
+                    <span class="s2">1.0</span><span class="s0">, </span><span class="s1">(</span><span class="s2">255</span><span class="s0">, </span><span class="s2">255</span><span class="s0">, </span><span class="s2">255</span><span class="s1">))</span>
+
+
+    <span class="s0">if </span><span class="s1">viewblue == </span><span class="s0">True</span><span class="s1">:</span>
+        <span class="s1">contours</span><span class="s0">, </span><span class="s1">hierarchy = cv2.findContours(blue_mask</span><span class="s0">,</span>
+                                           <span class="s1">cv2.RETR_TREE</span><span class="s0">,</span>
+                                           <span class="s1">cv2.CHAIN_APPROX_SIMPLE)</span>
+        <span class="s0">for </span><span class="s1">pic</span><span class="s0">, </span><span class="s1">contour </span><span class="s0">in </span><span class="s1">enumerate(contours):</span>
+            <span class="s1">area = cv2.contourArea(contour)</span>
+            <span class="s0">if </span><span class="s1">(area &gt; </span><span class="s2">300</span><span class="s1">):</span>
+                <span class="s1">x</span><span class="s0">, </span><span class="s1">y</span><span class="s0">, </span><span class="s1">w</span><span class="s0">, </span><span class="s1">h = cv2.boundingRect(contour)</span>
+                <span class="s1">imageFrame = cv2.rectangle(imageFrame</span><span class="s0">, </span><span class="s1">(x</span><span class="s0">, </span><span class="s1">y)</span><span class="s0">,</span>
+                                       <span class="s1">(x + w</span><span class="s0">, </span><span class="s1">y + h)</span><span class="s0">,</span>
+                                       <span class="s1">(</span><span class="s2">255</span><span class="s0">, </span><span class="s2">0</span><span class="s0">, </span><span class="s2">0</span><span class="s1">)</span><span class="s0">, </span><span class="s2">2</span><span class="s1">)</span>
+
+                <span class="s1">cv2.putText(imageFrame</span><span class="s0">, </span><span class="s3">&quot;Blue Color&quot;</span><span class="s0">, </span><span class="s1">(x</span><span class="s0">, </span><span class="s1">y)</span><span class="s0">,</span>
+                        <span class="s1">cv2.FONT_HERSHEY_SIMPLEX</span><span class="s0">,</span>
+                        <span class="s2">1.0</span><span class="s0">, </span><span class="s1">(</span><span class="s2">255</span><span class="s0">, </span><span class="s2">0</span><span class="s0">, </span><span class="s2">0</span><span class="s1">))</span>
+
+
+
+
+
+    <span class="s1">cv2.imshow(</span><span class="s3">&quot;Wobble Ring Detection - Python&quot;</span><span class="s0">, </span><span class="s1">imageFrame)</span>
+    <span class="s0">if </span><span class="s1">cv2.waitKey(</span><span class="s2">10</span><span class="s1">) &amp; </span><span class="s2">0xFF </span><span class="s1">== ord(</span><span class="s3">'q'</span><span class="s1">):</span>
+        <span class="s1">cap.release()</span>
+        <span class="s1">cv2.destroyAllWindows()</span>
+        <span class="s0">break</span></pre>
+</body>
+</html>
